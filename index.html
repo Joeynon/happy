@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今天，給你一點溫暖</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap">
+<style>
+  :root { --bg:#FFF8F0; --ink:#3B2F2F; --soft:#7A6A63; --card:#FFFFFF; --accent:#E07A5F; --tint:#FFE9C7; --line:#F0E4D8; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; min-height:100%; background:var(--bg); color:var(--ink); font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
+  body { display:flex; justify-content:center; padding:32px 20px 48px; transition:background .6s; }
+  main { width:100%; max-width:560px; }
+  main.wide { max-width:760px; }
+  .view { animation:fadeUp .5s ease both; }
+  h1 { font-family:'Noto Serif TC', serif; font-size:30px; line-height:1.4; margin:24px 0 8px; text-align:center; }
+  h2 { font-size:20px; margin:32px 0 12px; }
+  .sub { color:var(--soft); text-align:center; font-size:16px; margin:0 0 32px; line-height:1.7; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .opt { border:none; border-radius:20px; padding:22px 12px; font:inherit; font-size:18px; font-weight:500; color:var(--ink); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:8px; transition:transform .15s; }
+  .opt:hover { transform:translateY(-3px); }
+  button:focus-visible, .msg-card:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+  .opt .ico { font-size:30px; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .back { background:none; border:none; font:inherit; color:var(--soft); cursor:pointer; font-size:15px; padding:8px 0; }
+  .tag { font-size:14px; padding:6px 14px; border-radius:999px; background:var(--tint); }
+  .msg-card { background:var(--card); border-radius:28px; padding:56px 32px; min-height:300px; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; border:1px solid var(--line); }
+  .msg { font-family:'Noto Serif TC', serif; font-size:24px; line-height:1.8; margin:0; animation:fadeUp .6s ease both; }
+  .dots { display:flex; justify-content:center; gap:8px; margin:24px 0; }
+  .dot { width:9px; height:9px; border-radius:50%; background:#E8D9CC; transition:background .3s, transform .3s; }
+  .dot.on { background:var(--accent); transform:scale(1.2); }
+  .btn { display:block; width:100%; border:none; border-radius:16px; padding:16px; font:inherit; font-size:17px; font-weight:500; cursor:pointer; background:var(--accent); color:#FFFDF9; }
+  .btn.ghost { background:transparent; color:var(--ink); border:1.5px solid #E3D3C5; margin-top:12px; }
+  .moods { display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; margin-top:8px; }
+  .mood { border:none; border-radius:18px; background:var(--card); border:1px solid var(--line); padding:16px 4px 12px; cursor:pointer; font:inherit; color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:6px; transition:transform .15s, background .2s; }
+  .mood:hover { transform:translateY(-3px); background:var(--tint); }
+  .mood .face { font-size:34px; }
+  .mood .lbl { font-size:13px; color:var(--soft); }
+  .end-heart { font-size:48px; text-align:center; margin:8px 0 0; }
+  .help { margin-top:28px; font-size:14px; line-height:1.7; color:var(--soft); text-align:center; }
+  .help b { color:var(--ink); }
+  footer { margin-top:40px; display:flex; justify-content:space-between; font-size:13px; color:#A8968C; }
+  .admin-link { background:none; border:none; font:inherit; font-size:13px; color:#C9B8AC; cursor:pointer; padding:0; }
+  .float { position:fixed; bottom:-40px; font-size:24px; pointer-events:none; animation:rise 4s ease-in forwards; }
+  .kpis { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+  .kpi .k { font-size:13px; color:var(--soft); margin:0 0 6px; }
+  .kpi .v { font-size:28px; font-weight:700; margin:0; }
+  .kpi .s { font-size:13px; color:var(--soft); margin:4px 0 0; }
+  .bars { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+  .bar-row { display:grid; grid-template-columns:150px 1fr 44px 90px; align-items:center; gap:10px; margin:8px 0; font-size:14px; }
+  .track { background:#F5EBE2; border-radius:999px; height:14px; overflow:hidden; }
+  .fill { height:100%; border-radius:999px; }
+  .num { text-align:right; font-weight:500; }
+  .delta { text-align:right; color:var(--soft); font-size:13px; }
+  table.log { width:100%; border-collapse:collapse; background:var(--card); border-radius:18px; overflow:hidden; font-size:14px; }
+  table.log th, table.log td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); }
+  table.log th { background:#FBF1E7; font-weight:500; }
+  .name-box { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px 18px; margin:0 0 18px; display:flex; flex-direction:column; gap:8px; }
+  .name-box label { font-size:14px; color:var(--soft); }
+  .name-err { margin:0; font-size:14px; color:#B4412F; }
+  .name-input.bad { border-color:#B4412F; }
+  .name-input { font:inherit; font-size:18px; color:var(--ink); border:1.5px solid #E3D3C5; border-radius:12px; padding:10px 14px; background:#FFFDF9; width:100%; }
+  .name-input:focus { outline:3px solid var(--accent); outline-offset:1px; border-color:transparent; }
+  .log-wrap { overflow-x:auto; border-radius:18px; border:1px solid var(--line); }
+  .del { background:none; border:1px solid #E3D3C5; border-radius:10px; padding:5px 10px; font:inherit; font-size:13px; color:var(--soft); cursor:pointer; white-space:nowrap; }
+  .del.armed { background:#B4412F; border-color:#B4412F; color:#FFFDF9; }
+  .import-panel { margin-top:14px; background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; }
+  .import-area { width:100%; font:inherit; font-size:14px; border:1.5px solid #E3D3C5; border-radius:12px; padding:10px; background:#FFFDF9; color:var(--ink); resize:vertical; }
+  .note { font-size:13px; color:var(--soft); line-height:1.7; margin:12px 0 0; }
+  .row-btns { display:flex; gap:10px; margin-top:16px; }
+  .row-btns .btn { margin-top:0; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  @keyframes rise { to { transform:translateY(-110vh); opacity:0; } }
+  @media (max-width:560px) { .kpis { grid-template-columns:1fr 1fr; } .bar-row { grid-template-columns:96px 1fr 32px 72px; } .mood .lbl { font-size:12px; } }
+  @media (prefers-reduced-motion: reduce) { .view, .msg { animation:none; } .float { display:none; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+
+<script>
+// ✏️ 想改內容，就改這裡：每個分類一組句子，會依序出現
+const TOPICS = [
+  { key:"study", icon:"📚", name:"課業", color:"#DCE8FF", bar:"#6E93D6", msgs:[
+    "先深呼吸一下。你已經比你以為的還要努力了。",
+    "成績只是某一天的你，不是全部的你。",
+    "讀不完很正常，連教授自己的講義都不一定讀得完。",
+    "你是最厲害的喔！",
+    "等這段撐過去，你會很佩服現在的自己。"
+  ]},
+  { key:"love", icon:"💗", name:"戀愛", color:"#FFDDE4", bar:"#D9738C", msgs:[
+    "會為一個人煩惱，代表你很認真地喜歡過。",
+    "你值得被好好對待，不需要用委屈去換。",
+    "不管結果怎樣，你都不會因此變得比較不好。",
+    "心痛的時候，記得對自己好一點，吃好，過好比什麼都重要！",
+    "你值得被愛。"
+  ]},
+  { key:"family", icon:"🏠", name:"家庭", color:"#FFE9C7", bar:"#D99A3E", msgs:[
+    "家人之間的愛，有時候會用很笨拙的方式表現。",
+    "你的感受是真的，不需要說服任何人才算數。",
+    "就算世界喧鬧，你也可以替自己留一個安靜的角落。",
+    "你不必替所有人的情緒負責。",
+    "你在努力讓自己好好的，這已經很勇敢了。"
+  ]},
+  { key:"friends", icon:"🤝", name:"人際", color:"#DDF3E4", bar:"#4FA36F", msgs:[
+    "不需要每個人都要喜歡你，你已經是最好的了。",
+    "真正的朋友，不需要你一直表現得很好。",
+    "被誤會很難受，但時間常常會替你說話。",
+    "你可以先對自己好一點，再決定要對誰好。",
+    "幾個讓你安心的人，比一大群熱鬧更珍貴。"
+  ]},
+  { key:"self", icon:"🌱", name:"對自己沒信心", color:"#EDE3FF", bar:"#8B72CF", msgs:[
+    "你不需要變成別人，才值得被喜歡。",
+    "那些你以為做不到的事，其實已經有好幾件做到了。",
+    "花期不一樣，不代表不會開。",
+    "今天能起床、點進這裡，就值得一個讚。",
+    "你對朋友多溫柔，也請對自己那樣溫柔。"
+  ]},
+  { key:"tired", icon:"🌙", name:"說不上來，只是累了", color:"#E4ECF2", bar:"#6F8A9C", msgs:[
+    "累了就休息，休息不是偷懶。",
+    "不知道為什麼難過，也是可以的。",
+    "今天就算什麼都沒做好，你也還是很重要。",
+    "去喝杯溫溫的東西、蓋好被子，世界明天再說。",
+    "謝謝你撐到現在，辛苦了。"
+  ]}
+];
+
+const MOODS = [
+  { v:1, face:"😢", lbl:"很糟" },
+  { v:2, face:"🙁", lbl:"不太好" },
+  { v:3, face:"😐", lbl:"普通" },
+  { v:4, face:"🙂", lbl:"還不錯" },
+  { v:5, face:"😄", lbl:"很開心" }
+];
+
+const app = document.getElementById("app");
+const BASE_BG = "#FFF8F0";
+const LOCAL_KEY = "comfort_visits_v1";
+let db = null;
+let statsUnsub = null;
+let homeTimer = null;
+let visitorName = "";
+
+const dbReady = (window.claude && typeof claude.use === "function")
+  ? claude.use("db").then(d => { db = d; return d; }).catch(() => null)
+  : Promise.resolve(null);
+
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of kids) if (c != null) n.append(c);
+  return n;
+}
+
+function setTheme(color) {
+  document.body.style.background = color ? mix(color) : BASE_BG;
+  document.documentElement.style.setProperty("--tint", color || "#FFE9C7");
+}
+function mix(hex) {
+  const a = [0xFF, 0xF8, 0xF0], b = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  return "rgb(" + a.map((x, i) => Math.round(x * 0.55 + b[i] * 0.45)).join(",") + ")";
+}
+function render(node, wide) {
+  clearTimeout(homeTimer);
+  app.className = wide ? "wide" : "";
+  app.replaceChildren(node);
+  window.scrollTo(0, 0);
+}
+
+/* ---------- 體驗流程 ---------- */
+
+function home(reset) {
+  stopStats();
+  setTheme(null);
+  if (reset === true) visitorName = "";
+  const input = el("input", { id:"nm", class:"name-input", type:"text", maxlength:"20", placeholder:"例如：小明", autocomplete:"off" });
+  input.value = visitorName;
+  const err = el("p", { class:"name-err", role:"alert", hidden:"" }, "請先輸入名字或暱稱，再選煩惱喔");
+  input.setAttribute("aria-required", "true");
+  input.addEventListener("input", () => { visitorName = input.value.trim(); if (visitorName) { err.hidden = true; input.classList.remove("bad"); } });
+  render(el("div", { class:"view" },
+    el("h1", {}, "今天，有什麼放在心上嗎？"),
+    el("p", { class:"sub" }, "選一個最接近的，我想跟你說幾句話。"),
+    el("div", { class:"name-box" },
+      el("label", { for:"nm" }, "你的名字或暱稱（必填）"), input, err),
+    el("div", { class:"grid" }, ...TOPICS.map(t =>
+      el("button", { class:"opt", style:"background:" + t.color, onclick:() => { if (!visitorName) { err.hidden = false; input.classList.add("bad"); input.focus(); return; } askBefore(t); } },
+        el("span", { class:"ico", "aria-hidden":"true" }, t.icon), t.name)
+    )),
+    el("footer", {}, el("span", {}, "一個正向心理學課程的小作品 ♡"),
+      el("button", { class:"admin-link", onclick:() => { location.hash = "stats"; } }, "後台"))
+  ));
+}
+
+function moodPicker(onPick) {
+  return el("div", { class:"moods" }, ...MOODS.map(m =>
+    el("button", { class:"mood", "aria-label":m.v + " 分，" + m.lbl, onclick:() => onPick(m.v) },
+      el("span", { class:"face", "aria-hidden":"true" }, m.face),
+      el("span", { class:"lbl" }, m.lbl))
+  ));
+}
+
+function askBefore(t) {
+  setTheme(t.color);
+  render(el("div", { class:"view" },
+    el("div", { class:"top" },
+      el("button", { class:"back", onclick:home }, "← 換一個"),
+      el("span", { class:"tag" }, t.icon + " " + t.name)),
+    el("h1", {}, visitorName ? "嗨，" + visitorName + "。開始之前，" : "開始之前，"),
+    el("p", { class:"sub" }, "你現在的心情大概是幾分？"),
+    moodPicker(v => show(t, 0, { topic:t.key, name:visitorName, before:v }))
+  ));
+}
+
+function show(t, i, rec) {
+  setTheme(t.color);
+  if (i >= t.msgs.length) return askAfter(t, rec);
+  const next = () => show(t, i + 1, rec);
+  const card = el("div", { class:"msg-card", role:"button", tabindex:"0", "aria-label":"下一句", onclick:next,
+    onkeydown:e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); } } },
+    el("p", { class:"msg", "aria-live":"polite" }, t.msgs[i]));
+  render(el("div", { class:"view" },
+    el("div", { class:"top" },
+      el("button", { class:"back", onclick:home }, "← 換一個"),
+      el("span", { class:"tag" }, t.icon + " " + t.name)),
+    card,
+    el("div", { class:"dots", "aria-hidden":"true" }, ...t.msgs.map((_, k) => el("span", { class:"dot" + (k <= i ? " on" : "") }))),
+    el("button", { class:"btn", onclick:next }, i === t.msgs.length - 1 ? "收下了 ♡" : "下一句 →")
+  ));
+  card.focus({ preventScroll:true });
+}
+
+function askAfter(t, rec) {
+  render(el("div", { class:"view" },
+    el("h1", {}, "看完之後，"),
+    el("p", { class:"sub" }, "現在的心情是幾分呢？"),
+    moodPicker(v => { const full = { ...rec, after:v, ts:Date.now() }; save(full); end(t, full); })
+  ));
+}
+
+function end(t, rec) {
+  hearts();
+  const better = rec.after > rec.before;
+  render(el("div", { class:"view" },
+    el("p", { class:"end-heart", "aria-hidden":"true" }, "🫶"),
+    el("h1", {}, (rec.name ? rec.name + "，" : "") + (better ? "有好一點點，真好" : "謝謝你願意停下來")),
+    el("p", { class:"sub" }, better ? "記得這種感覺，下次不開心可以再回來。" : "不用一下子就好起來，慢慢來就可以。"),
+    el("button", { class:"btn", onclick:() => home(true) }, "回到首頁"),
+    el("p", { class:"help" }, "如果真的很難受、撐不太住，", el("br"),
+      "可以打 ", el("b", {}, "1925 安心專線"), "（24 小時、免付費），有人會聽你說。")
+  ));
+  homeTimer = setTimeout(() => home(true), 15000);
+}
+
+function hearts() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const set = ["💗", "🧡", "💛", "💖", "✨"];
+  for (let k = 0; k < 14; k++) {
+    const h = el("span", { class:"float", "aria-hidden":"true" }, set[k % set.length]);
+    h.style.left = Math.random() * 95 + "vw";
+    h.style.animationDelay = (Math.random() * 1.2) + "s";
+    document.body.append(h);
+    setTimeout(() => h.remove(), 5500);
+  }
+}
+
+/* ---------- 資料儲存 ---------- */
+
+// 第一輪擺攤資料（2026/11/19～11/21，共 45 筆；為保護隱私，名字已匿名）
+const SEED = [{"topic": "study", "name": "參與者 01", "before": 3, "after": 3, "ts": 1795052748618, "lid": "seed01"}, {"topic": "study", "name": "參與者 02", "before": 2, "after": 4, "ts": 1795054262183, "lid": "seed02"}, {"topic": "tired", "name": "參與者 03", "before": 2, "after": 4, "ts": 1795054283356, "lid": "seed03"}, {"topic": "tired", "name": "參與者 04", "before": 3, "after": 4, "ts": 1795054375652, "lid": "seed04"}, {"topic": "tired", "name": "參與者 05", "before": 3, "after": 3, "ts": 1795054469393, "lid": "seed05"}, {"topic": "study", "name": "參與者 06", "before": 3, "after": 5, "ts": 1795054542153, "lid": "seed06"}, {"topic": "tired", "name": "參與者 07", "before": 4, "after": 5, "ts": 1795054581549, "lid": "seed07"}, {"topic": "tired", "name": "參與者 08", "before": 2, "after": 1, "ts": 1795054662133, "lid": "seed08"}, {"topic": "tired", "name": "參與者 09", "before": 3, "after": 1, "ts": 1795054710174, "lid": "seed09"}, {"topic": "friends", "name": "參與者 10", "before": 3, "after": 5, "ts": 1795054820754, "lid": "seed10"}, {"topic": "tired", "name": "參與者 11", "before": 5, "after": 5, "ts": 1795054910505, "lid": "seed11"}, {"topic": "tired", "name": "參與者 12", "before": 3, "after": 5, "ts": 1795054979548, "lid": "seed12"}, {"topic": "tired", "name": "參與者 13", "before": 2, "after": 2, "ts": 1795057819683, "lid": "seed13"}, {"topic": "friends", "name": "參與者 14", "before": 4, "after": 5, "ts": 1795057879902, "lid": "seed14"}, {"topic": "study", "name": "參與者 15", "before": 3, "after": 5, "ts": 1795058095189, "lid": "seed15"}, {"topic": "study", "name": "參與者 16", "before": 4, "after": 4, "ts": 1795058193815, "lid": "seed16"}, {"topic": "tired", "name": "參與者 17", "before": 3, "after": 3, "ts": 1795058304135, "lid": "seed17"}, {"topic": "study", "name": "參與者 18", "before": 4, "after": 4, "ts": 1795058379975, "lid": "seed18"}, {"topic": "self", "name": "參與者 19", "before": 3, "after": 4, "ts": 1795058596124, "lid": "seed19"}, {"topic": "love", "name": "參與者 20", "before": 1, "after": 4, "ts": 1795058787011, "lid": "seed20"}, {"topic": "study", "name": "參與者 21", "before": 2, "after": 4, "ts": 1795070654180, "lid": "seed21"}, {"topic": "family", "name": "參與者 22", "before": 2, "after": 3, "ts": 1795070688943, "lid": "seed22"}, {"topic": "self", "name": "參與者 23", "before": 2, "after": 4, "ts": 1795070706559, "lid": "seed23"}, {"topic": "tired", "name": "參與者 24", "before": 2, "after": 4, "ts": 1795070719399, "lid": "seed24"}, {"topic": "study", "name": "參與者 25", "before": 3, "after": 4, "ts": 1795070778837, "lid": "seed25"}, {"topic": "tired", "name": "參與者 26", "before": 2, "after": 5, "ts": 1795071607654, "lid": "seed26"}, {"topic": "tired", "name": "參與者 27", "before": 3, "after": 3, "ts": 1795071701330, "lid": "seed27"}, {"topic": "study", "name": "參與者 28", "before": 2, "after": 5, "ts": 1795071880201, "lid": "seed28"}, {"topic": "love", "name": "參與者 29", "before": 1, "after": 4, "ts": 1795071903048, "lid": "seed29"}, {"topic": "family", "name": "參與者 30", "before": 1, "after": 3, "ts": 1795071924372, "lid": "seed30"}, {"topic": "friends", "name": "參與者 31", "before": 1, "after": 4, "ts": 1795071946093, "lid": "seed31"}, {"topic": "self", "name": "參與者 32", "before": 1, "after": 4, "ts": 1795071970907, "lid": "seed32"}, {"topic": "friends", "name": "參與者 33", "before": 1, "after": 2, "ts": 1795072039761, "lid": "seed33"}, {"topic": "love", "name": "參與者 34", "before": 5, "after": 5, "ts": 1795072181134, "lid": "seed34"}, {"topic": "self", "name": "參與者 35", "before": 4, "after": 5, "ts": 1795072659316, "lid": "seed35"}, {"topic": "tired", "name": "參與者 36", "before": 4, "after": 4, "ts": 1795075250289, "lid": "seed36"}, {"topic": "study", "name": "參與者 37", "before": 1, "after": 3, "ts": 1795075304986, "lid": "seed37"}, {"topic": "study", "name": "參與者 38", "before": 2, "after": 4, "ts": 1795075363875, "lid": "seed38"}, {"topic": "love", "name": "參與者 39", "before": 2, "after": 3, "ts": 1795075396669, "lid": "seed39"}, {"topic": "love", "name": "參與者 40", "before": 3, "after": 3, "ts": 1795075474913, "lid": "seed40"}, {"topic": "love", "name": "參與者 41", "before": 4, "after": 5, "ts": 1795075638656, "lid": "seed41"}, {"topic": "family", "name": "參與者 42", "before": 1, "after": 4, "ts": 1795075713995, "lid": "seed42"}, {"topic": "study", "name": "參與者 43", "before": 3, "after": 5, "ts": 1795077487312, "lid": "seed43"}, {"topic": "self", "name": "參與者 44", "before": 2, "after": 4, "ts": 1795082513419, "lid": "seed44"}, {"topic": "self", "name": "參與者 45", "before": 2, "after": 3, "ts": 1795194566186, "lid": "seed45"}];
+(function seedOnce() {
+  try {
+    if (localStorage.getItem("comfort_seeded_v1")) return;
+    const cur = JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+    const have = new Set(cur.map(r => r.lid));
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(SEED.filter(r => !have.has(r.lid)).concat(cur)));
+    localStorage.setItem("comfort_seeded_v1", "1");
+  } catch (e) {}
+})();
+
+function readLocal() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch (e) { return []; }
+}
+function writeLocal(rec) {
+  try { const a = readLocal(); a.push({ ...rec, lid:"l" + rec.ts + Math.random().toString(36).slice(2, 6) }); localStorage.setItem(LOCAL_KEY, JSON.stringify(a)); } catch (e) {}
+}
+function deleteLocal(lid) {
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(readLocal().filter(r => r.lid !== lid))); return true; } catch (e) { return false; }
+}
+async function save(rec) {
+  await dbReady;
+  if (db) {
+    try { await db.collection("visits").add(rec); return; }
+    catch (e) {
+      if (e && e.code === "unavailable") {
+        await new Promise(r => setTimeout(r, 800 + Math.random() * 800));
+        try { await db.collection("visits").add(rec); return; } catch (e2) {}
+      }
+    }
+  }
+  writeLocal(rec);
+}
+
+/* ---------- 後台統計 ---------- */
+
+function stopStats() { if (statsUnsub) { statsUnsub(); statsUnsub = null; } }
+
+async function stats() {
+  setTheme(null);
+  const box = el("div", { class:"view" });
+  render(box, true);
+  box.append(el("p", { class:"sub" }, "讀取資料中…"));
+  await dbReady;
+  if (location.hash !== "#stats") return;
+  let cloud = [], cloudState = "loading";
+  const draw = () => drawStats(box, cloud, readLocal().map(r => ({ ...r, _src:"local", _id:r.lid })), cloudState, draw);
+  if (!db) { cloudState = "none"; draw(); return; }
+  const timer = setTimeout(() => { cloudState = "slow"; draw(); }, 10000);
+  stopStats();
+  statsUnsub = db.collection("visits").orderBy("ts", "desc").limit(1000).onSnapshot(snap => {
+    cloud = snap.docs.map(d => ({ ...d.data(), _src:"cloud", _id:d.id }));
+    if (!snap.metadata.fromCache) { clearTimeout(timer); cloudState = "ok"; }
+    draw();
+  }, () => { clearTimeout(timer); cloudState = "error"; draw(); });
+}
+
+function avg(a) { return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; }
+function f1(x) { return x == null ? "—" : x.toFixed(1); }
+function sign(x) { return x == null ? "—" : (x > 0 ? "+" : "") + x.toFixed(1); }
+function fmtTime(ts) { const d = new Date(ts); return (d.getMonth() + 1) + "/" + d.getDate() + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+
+function delButton(r, redraw) {
+  let armed = false, t = null;
+  const b = el("button", { class:"del", "aria-label":"刪除這筆紀錄" }, "刪除");
+  b.addEventListener("click", async () => {
+    if (!armed) {
+      armed = true; b.textContent = "確定刪除？"; b.classList.add("armed");
+      t = setTimeout(() => { armed = false; b.textContent = "刪除"; b.classList.remove("armed"); }, 4000);
+      return;
+    }
+    clearTimeout(t); b.disabled = true; b.textContent = "刪除中…";
+    if (r._src === "local") { deleteLocal(r._id); redraw(); return; }
+    try { await db.collection("visits").doc(r._id).delete(); }
+    catch (e) { b.disabled = false; armed = false; b.classList.remove("armed"); b.textContent = "刪除失敗，再試一次"; }
+  });
+  return b;
+}
+
+function parseTime(str) {
+  const m = String(str).match(/(\d{4})\/(\d{1,2})\/(\d{1,2})\s*(上午|下午)?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return null;
+  let h = +m[5];
+  if (m[4] === "下午" && h < 12) h += 12;
+  if (m[4] === "上午" && h === 12) h = 0;
+  return new Date(+m[1], +m[2] - 1, +m[3], h, +m[6], +(m[7] || 0)).getTime();
+}
+
+async function importCsv(text, existing) {
+  const lines = String(text || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return { error:"還沒貼上任何資料。" };
+  const keyOf = r => r.ts + "|" + (r.name || "") + "|" + r.topic + "|" + r.before + "|" + r.after;
+  const seen = new Set(existing.map(keyOf));
+  let added = 0, skipped = 0;
+  await dbReady;
+  for (const line of lines) {
+    const c = line.split(/,|\t/).map(x => x.trim());
+    if (c[0] === "時間" || c.length < 5) { if (c[0] !== "時間") skipped++; continue; }
+    const topic = (TOPICS.find(t => t.name === c[2] || t.key === c[2]) || {}).key;
+    const before = parseInt(c[3], 10), after = parseInt(c[4], 10);
+    let ts = c[6] && /^\d{10,}$/.test(c[6]) ? +c[6] : parseTime(c[0]);
+    if (!topic || !(before >= 1 && before <= 5) || !(after >= 1 && after <= 5) || !ts) { skipped++; continue; }
+    const rec = { topic, name:c[1] === "（未填）" ? "" : c[1].slice(0, 20), before, after, ts };
+    const k = keyOf(rec);
+    if (seen.has(k)) { skipped++; continue; }
+    seen.add(k);
+    let ok = false;
+    if (db) { try { await db.collection("visits").add(rec); ok = true; } catch (e) {} }
+    if (!ok) writeLocal(rec);
+    added++;
+  }
+  return { added, skipped };
+}
+
+function drawStats(box, cloud, local, state, redraw) {
+  const all = cloud.concat(local).filter(r => r && r.topic && r.before && r.after).sort((a, b) => b.ts - a.ts);
+  const n = all.length;
+  const b = avg(all.map(r => r.before)), a = avg(all.map(r => r.after));
+  const better = n ? Math.round(all.filter(r => r.after > r.before).length / n * 100) : null;
+  const max = Math.max(1, ...TOPICS.map(t => all.filter(r => r.topic === t.key).length));
+  const name = k => (TOPICS.find(t => t.key === k) || { name:k }).name;
+
+  const notes = {
+    loading:"正在連線後台…",
+    ok:"資料存在後台，換裝置也看得到。",
+    slow:"後台暫時連不上，下面可能不是最新的。",
+    error:"後台讀取失敗，只顯示這台裝置上的紀錄。",
+    none:"這個畫面沒有連上後台，資料只存在這台裝置的瀏覽器裡，清除瀏覽紀錄就會不見。"
+  };
+
+  const copyBtn = el("button", { class:"btn ghost", onclick:async () => {
+    const csv = "時間,名稱,分類,看之前,看之後,變化,代碼\n" + all.map(r =>
+      [new Date(r.ts).toLocaleString("zh-TW"), (r.name || "").replace(/[,\n\r"]/g, " "), name(r.topic), r.before, r.after, r.after - r.before, r.ts].join(",")).join("\n");
+    try { await navigator.clipboard.writeText(csv); copyBtn.textContent = "已複製，可以貼到 Excel"; }
+    catch (e) { copyBtn.textContent = "複製失敗，請再試一次"; }
+  } }, "複製所有資料（CSV）");
+
+  const importMsg = el("p", { class:"note" }, "");
+  const importArea = el("textarea", { class:"import-area", rows:"6", placeholder:"把「複製所有資料」複製出來的內容整段貼在這裡" });
+  const importPanel = el("div", { class:"import-panel", hidden:"" },
+    el("label", { class:"note", style:"margin:0 0 8px;display:block" }, "從另一個版本的後台匯入資料（重複的紀錄會自動略過）"),
+    importArea,
+    el("button", { class:"btn", style:"margin-top:10px", onclick:async e => {
+      const btn = e.currentTarget; btn.disabled = true; importMsg.textContent = "匯入中…";
+      const res = await importCsv(importArea.value, all);
+      btn.disabled = false;
+      importMsg.textContent = res.error ? res.error : "已匯入 " + res.added + " 筆" + (res.skipped ? "，略過 " + res.skipped + " 筆重複或看不懂的資料" : "") + "。";
+      if (res.added) { importArea.value = ""; redraw(); }
+    } }, "匯入"),
+    importMsg);
+  const importToggle = el("button", { class:"btn ghost", onclick:() => { importPanel.hidden = !importPanel.hidden; } }, "匯入資料");
+
+  box.replaceChildren(
+    el("div", { class:"top" },
+      el("button", { class:"back", onclick:() => { location.hash = ""; home(); } }, "← 回到首頁"),
+      el("span", { class:"tag" }, "後台統計")),
+    el("h1", {}, "大家的心情"),
+    el("div", { class:"kpis" },
+      el("div", { class:"kpi" }, el("p", { class:"k" }, "參與人次"), el("p", { class:"v" }, String(n)), el("p", { class:"s" }, "完成整個流程的人")),
+      el("div", { class:"kpi" }, el("p", { class:"k" }, "平均心情"), el("p", { class:"v" }, f1(b) + " → " + f1(a)), el("p", { class:"s" }, "看之前 → 看之後（滿分 5）")),
+      el("div", { class:"kpi" }, el("p", { class:"k" }, "心情變好的人"), el("p", { class:"v" }, better == null ? "—" : better + "%"), el("p", { class:"s" }, "看之後分數比較高"))
+    ),
+    el("h2", {}, "大家點了哪些煩惱"),
+    el("div", { class:"bars" },
+      el("div", { class:"bar-row", style:"color:var(--soft);font-size:12px;margin-top:0" },
+        el("span", {}, "分類"), el("span", {}, ""), el("span", { class:"num" }, "人次"), el("span", { class:"delta" }, "平均變化")),
+      ...TOPICS.map(t => {
+        const rs = all.filter(r => r.topic === t.key);
+        const d = rs.length ? avg(rs.map(r => r.after - r.before)) : null;
+        return el("div", { class:"bar-row" },
+          el("span", {}, t.icon + " " + t.name),
+          el("div", { class:"track" }, el("div", { class:"fill", style:"width:" + (rs.length / max * 100) + "%;background:" + t.bar })),
+          el("span", { class:"num" }, String(rs.length)),
+          el("span", { class:"delta" }, d == null ? "—" : sign(d) + " 分"));
+      })
+    ),
+    el("h2", {}, "所有紀錄（" + n + " 筆）"),
+    n ? el("div", { class:"log-wrap" }, el("table", { class:"log" },
+      el("tr", {}, el("th", {}, "時間"), el("th", {}, "名稱"), el("th", {}, "分類"), el("th", {}, "之前"), el("th", {}, "之後"), el("th", {}, "")),
+      ...all.map(r => el("tr", {},
+        el("td", {}, fmtTime(r.ts)), el("td", {}, r.name || "（未填）"), el("td", {}, name(r.topic)),
+        el("td", {}, MOODS[r.before - 1].face + " " + r.before), el("td", {}, MOODS[r.after - 1].face + " " + r.after),
+        el("td", {}, delButton(r, redraw))))))
+      : el("p", { class:"note" }, "還沒有人完成流程。"),
+    el("div", { class:"row-btns" }, copyBtn, importToggle),
+    importPanel,
+    el("p", { class:"note" }, notes[state] + (local.length && state !== "none" ? "（另有 " + local.length + " 筆暫存在這台裝置）" : ""))
+  );
+}
+
+/* ---------- 路由 ---------- */
+
+function route() { if (location.hash === "#stats") stats(); else home(); }
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
